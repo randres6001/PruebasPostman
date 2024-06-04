@@ -1,0 +1,241 @@
+{
+	"info": {
+		"_postman_id": "1ff919ad-a7a9-43e5-aaa5-5756226308ab",
+		"name": "API RickMorty",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34537720"
+	},
+	"item": [
+		{
+			"name": "Lista de todos los personajes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que la respuesta tiene el código de estado 200 (OK)\r",
+							"pm.test(\"Código de estado válido\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar que la respuesta contiene información de al menos un persoaje\r",
+							"\r",
+							"pm.test(\"Respuesta contiene información de al menos un personaje\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData).to.have.property(\"results\").that.is.an('array').and.is.not.empty; \r",
+							"    const randomCharacter = responseData.results[Math.floor(Math.random() * responseData.results.length)]; \r",
+							"    pm.test(\"Información del personaje aleatorio\", function (){\r",
+							"        pm.expect(randomCharacter).to.have.property(\"name\"); \r",
+							"        pm.expect(randomCharacter).to.have.property(\"species\"); \r",
+							"        pm.expect(randomCharacter).to.have.property(\"status\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url_C}}/character/",
+					"host": [
+						"{{base_url_C}}"
+					],
+					"path": [
+						"character",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Personajes por Pagina",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que la respuesta tiene el código de estado 200 (OK)\r",
+							"pm.test(\"Código de estado válido\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Generar un listado de los personajes que aparecen en la página\r",
+							"pm.test(\"Listado de personajes en la página\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    const characters = responseData.results;\r",
+							"    const characterNames = characters.map(character => character.name);\r",
+							"\r",
+							"    console.log(\"Personajes en la página:\", characterNames);\r",
+							"});\r",
+							"\r",
+							"var template = `\r",
+							"<style type=\"text/css\">\r",
+							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+							"    .tftable tr {background-color:#ffffff;}\r",
+							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+							"    .tftable tr:hover {background-color:#e0ffff;}\r",
+							"</style>\r",
+							"\r",
+							"<table class=\"tftable\" border=\"1\">\r",
+							"    <tr>\r",
+							"        <th>ID</th>\r",
+							"        <th>Name</th>\r",
+							"        <th>Status</th>\r",
+							"        <th>Species</th>\r",
+							"        <th>Type</th>\r",
+							"        <th>Gender</th>\r",
+							"        <th>Origin Name</th>\r",
+							"        <th>Location Name</th>\r",
+							"        <th>Image</th>\r",
+							"        <th>Episodes</th>\r",
+							"        <th>URL</th>\r",
+							"        <th>Created</th>\r",
+							"    </tr>\r",
+							"    \r",
+							"    {{#each response.results}}\r",
+							"        <tr id=row_{{@key}}>\r",
+							"            <td>{{id}}</td>\r",
+							"            <td>{{name}}</td>\r",
+							"            <td>{{status}}</td>\r",
+							"            <td>{{species}}</td>\r",
+							"            <td>{{type}}</td>\r",
+							"            <td>{{gender}}</td>\r",
+							"            <td>{{origin.name}}</td>\r",
+							"            <td>{{location.name}}</td>\r",
+							"            <td>{{image}}</td>\r",
+							"            <td>{{episode}}</td>\r",
+							"            <td>{{url}}</td>\r",
+							"            <td>{{created}}</td>\r",
+							"        </tr>\r",
+							"    {{/each}}\r",
+							"</table>\r",
+							"`;\r",
+							"\r",
+							"function constructVisualizerPayload() {\r",
+							"    return {response: pm.response.json()}\r",
+							"}\r",
+							"\r",
+							"pm.visualizer.set(template, constructVisualizerPayload());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url_C}}/character/?page=5",
+					"host": [
+						"{{base_url_C}}"
+					],
+					"path": [
+						"character",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Personaje por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que la respuesta tiene el código de estado 200 (OK)\r",
+							"pm.test(\"Código de estado válido\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar que la respuesta contiene información del personaje\r",
+							"pm.test(\"Respuesta contiene información del personaje\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData).to.have.property(\"id\"); // Verifica que el personaje tiene el campo \"id\"\r",
+							"    pm.expect(responseData).to.have.property(\"name\"); // Verifica que el personaje tiene el campo \"name\"\r",
+							"    pm.expect(responseData).to.have.property(\"species\"); // Verifica que el personaje tiene el campo \"species\"\r",
+							"    pm.expect(responseData).to.have.property(\"status\"); // Verifica que el personaje tiene el campo \"status\"\r",
+							"    pm.expect(responseData).to.have.property(\"type\"); // Verifica que el personaje tiene el campo \"type\"   \r",
+							"    pm.expect(responseData).to.have.property(\"gender\"); // Verifica que el personaje tiene el campo \"gender\"   \r",
+							"\r",
+							"    pm.expect(responseData.id).to.eql(2); // Verifica que el ID solicitado\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url_C}}/character/2",
+					"host": [
+						"{{base_url_C}}"
+					],
+					"path": [
+						"character",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Multiples ID Inexistentes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verificar que la respuesta tiene el código de estado 200 (OK)\r",
+							"pm.test(\"Código de estado válido\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Verificar que la respuesta es un array vacío\r",
+							"pm.test(\"Respuesta es un array vacío\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData).to.be.an('array').that.is.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url_C}}/character/[900,901,902]",
+					"host": [
+						"{{base_url_C}}"
+					],
+					"path": [
+						"character",
+						"[900,901,902]"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
